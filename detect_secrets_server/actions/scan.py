@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from detect_secrets.core.log import log
 
+from detect_secrets_server.actions.initialize import _clone_and_save_repo
 from detect_secrets_server.repos.base_tracked_repo import OverrideLevel
 from detect_secrets_server.repos.factory import tracked_repo_factory
 
@@ -26,16 +27,25 @@ def scan_repo(args):
         log.error('Unable to find repo: %s', args.repo)
         return 1
 
+    # if last_commit_hash is empty, re-clone and see if there's an initial commit hash
+    if repo.last_commit_hash is None:
+        _clone_and_save_repo(repo)
+
     secrets = repo.scan(
         exclude_files_regex=args.exclude_files,
         exclude_lines_regex=args.exclude_lines,
+        scan_head=args.scan_head,
     )
 
     if (len(secrets.data) > 0) or args.always_run_output_hook:
         _alert_on_secrets_found(repo, secrets.json(), args.output_hook)
 
     if args.always_update_state or (
-        len(secrets.data) == 0 and not args.dry_run
+        (len(secrets.data) == 0)
+        and
+        (not args.dry_run)
+        and
+        (not args.scan_head)
     ):
         _update_tracked_repo(repo)
 

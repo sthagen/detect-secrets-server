@@ -4,8 +4,13 @@ from __future__ import absolute_import
 import os
 import re
 import subprocess
+import sys
+
+from detect_secrets.core.log import log
 
 from detect_secrets_server.constants import IGNORED_FILE_EXTENSIONS
+
+GIT_EMPTY_TREE_HASH = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 def get_last_commit_hash(directory):
@@ -14,6 +19,10 @@ def get_last_commit_hash(directory):
         'rev-parse',
         'HEAD',
     )
+
+
+def get_empty_tree_commit_hash():
+    return GIT_EMPTY_TREE_HASH
 
 
 def clone_repo_to_location(repo, directory):
@@ -90,7 +99,7 @@ def get_baseline_file(directory, filename):
             raise
 
 
-def get_diff(directory, last_commit_hash):
+def get_diff(directory, last_commit_hash, files=None):
     """Returns the git diff between last commit hash, and HEAD."""
     kwargs = {'should_strip_output': False}
     git_args = [
@@ -99,7 +108,12 @@ def get_diff(directory, last_commit_hash):
         last_commit_hash,
         'HEAD',
     ]
-    filenames_to_include_in_diff = _filter_filenames_from_diff(directory, last_commit_hash)
+
+    if not files:
+        filenames_to_include_in_diff = _filter_filenames_from_diff(directory, last_commit_hash)
+    else:
+        filenames_to_include_in_diff = files
+
     if (
         filenames_to_include_in_diff
         and
@@ -120,6 +134,10 @@ def get_diff(directory, last_commit_hash):
         # Python 2 made me do this
         **kwargs
     )
+
+
+def get_diff_name_only(directory, last_commit_hash):
+    return _filter_filenames_from_diff(directory, last_commit_hash)
 
 
 def get_remote_url(directory):
@@ -175,16 +193,39 @@ def _filter_filenames_from_diff(directory, last_commit_hash):
 
 
 def _git(directory, *args, **kwargs):
-    output = subprocess.check_output(
-        [
-            'git',
-            '--git-dir', directory,
-        ] + list(args),
-        stderr=subprocess.STDOUT
-    ).decode('utf-8', errors='ignore')
+    try:
+        output = subprocess.check_output(
+            [
+                'git',
+                '--git-dir', directory,
+            ] + list(args),
+            stderr=subprocess.STDOUT
+        ).decode('utf-8', errors='ignore')
 
-    # This is to fix https://github.com/matiasb/python-unidiff/issues/54
-    if not kwargs.get('should_strip_output', True):
-        return output
+        # This is to fix https://github.com/matiasb/python-unidiff/issues/54
+        if not kwargs.get('should_strip_output', True):
+            return output
+        return output.strip()
+    except subprocess.CalledProcessError as e:
+        error_message = e.output.decode('utf-8')
 
-    return output.strip()
+        # Catch this error, this happens during scanning and means it's an empty repo. This bails out
+        # of the scan process and logs error.
+        if re.match(
+            r"fatal: couldn't find remote ref (None|HEAD)",
+            error_message
+        ):
+            # directory is the best/only output without drastic rewrites, hashed path correlates to repo
+            log.error("Empty repository cannot be scanned: %s", directory)
+            sys.exit(1)
+            # TODO: This won't work if scan loops through repos, but works since it's a single scan currently
+
+        # Catch this error, this happens during initialization and means it's an empty repo. This allows
+        # the repo metadata to be written to /tracked
+        elif re.match(
+                r"fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.",
+                error_message
+        ):
+            return None
+        else:
+            raise
