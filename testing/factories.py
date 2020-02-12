@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import json as json_module
 
 from detect_secrets.core.potential_secret import PotentialSecret
@@ -34,6 +32,7 @@ def metadata_factory(repo, json=False, **kwargs):
             "MailchimpDetector": {},
             "PrivateKeyDetector": {},
             "SlackDetector": {},
+            'SoftlayerDetector': {},
             "StripeDetector": {},
         },
         "repo": repo,

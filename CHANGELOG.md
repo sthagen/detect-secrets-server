@@ -26,6 +26,20 @@ your support! :star:
 -->
 
 
+### v0.2.20
+##### February 10th, 2020
+
+#### :snake: Miscellaneous
+
+* Bumped detect-secrets version from [0.12.7](https://github.com/Yelp/detect-secrets/blob/master/CHANGELOG.md#v0127) to [0.13.0](https://github.com/Yelp/detect-secrets/blob/master/CHANGELOG.md#v0130)
+
+### v0.2.19
+##### February 10th, 2020
+
+#### :bug: Bugfixes
+
+* [Exception handling on retrieving baseline](https://github.com/Yelp/detect-secrets-server/commit/8371f54193a353b94acd578065c45dc3c839ebf1)
+
 ### v0.2.18
 ##### February 4th, 2020
 

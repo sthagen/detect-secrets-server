@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-
 import os
 from contextlib import contextmanager
+from unittest import mock
 
-import mock
 import pytest
 
 from detect_secrets_server.actions import add_repo
@@ -82,6 +80,7 @@ class TestInitialize(object):
                     },
                     'PrivateKeyDetector': {},
                     'SlackDetector': {},
+                    'SoftlayerDetector': {},
                     'StripeDetector': {},
                 },
                 rootdir=mock_rootdir,
@@ -190,6 +189,7 @@ class TestInitialize(object):
                         'keyword_exclude': None,
                     },
                     'SlackDetector': {},
+                    'SoftlayerDetector': {},
                     'StripeDetector': {},
                 },
                 rootdir=mock_rootdir,
