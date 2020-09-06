@@ -25,6 +25,43 @@ your support! :star:
 [@xxxx]: https://github.com/xxxx
 -->
 
+### v0.3.2
+##### August 28th, 2020
+
+#### :snake: Miscellaneous
+
+* Add ability to pass arbritrary arguments to `detect-secrets` ([#65])
+
+[#65]: https://github.com/Yelp/detect-secrets-server/pull/65
+
+
+
+### v0.3.1
+##### August 26th, 2020
+
+#### :snake: Miscellaneous
+
+* Update development environment and testing setup ([#63])
+
+[#63]: https://github.com/Yelp/detect-secrets-server/pull/63
+
+
+
+### v0.3.0
+##### August 26th, 2020
+
+#### :boom: Breaking Changes
+
+* Drop support for Python 3 ([#51])
+
+#### :tada: New Features
+
+* Add a GitHub webhook scanner ([#56])
+
+[#51]: https://github.com/Yelp/detect-secrets-server/pull/51
+[#56]: https://github.com/Yelp/detect-secrets-server/pull/56
+
+
 
 ### v0.2.20
 ##### February 10th, 2020
@@ -40,12 +77,15 @@ your support! :star:
 
 * [Exception handling on retrieving baseline](https://github.com/Yelp/detect-secrets-server/commit/8371f54193a353b94acd578065c45dc3c839ebf1)
 
+
+
 ### v0.2.18
 ##### February 4th, 2020
 
 #### :tada: New Features
 
 * [Add ability to scan repo HEAD](https://github.com/Yelp/detect-secrets-server/commit/17e57e7ce3e60772cec96f3ad424d74684b3fdaf)
+
 
 
 ### v0.2.17
